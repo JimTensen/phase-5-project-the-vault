@@ -22,7 +22,7 @@ function App() {
         <div className ='navbar'>
             <h1 className ='navbarh'>The Vault</h1>
     {/* //     <GlobalStyle/>
-    //     <Navigation updateUser={updateUser}/>
+    //     <Nav updateUser={updateUser}/>
     //         <Switch>*/}
                 <Route exact path='/'>
                     <Home/>

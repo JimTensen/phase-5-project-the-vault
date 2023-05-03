@@ -42,20 +42,16 @@ function Authentication({updateUser}) {
     
     return (
         <>
-        <h2>{Object.values(formik.errors)}</h2>
+        {Object.values(formik.errors).map(error => <h2>{error}</h2>)}
         <h2>enter the site or register!</h2>
         <h2>{signUp?'Already a member?':'Not yet a member?'}</h2>
         <button onClick={handleClick}>{signUp?'Log in':'Register'}</button>
         <Form onSubmit={formik.handleSubmit}>
-            <label>
-            Username
-            </label>
+            <label>Username</label>
         <input type='text' name='name' value={formik.values.name} onChange={formik.handleChange} />
         {signUp&&(
             <>
-            <label>
-                Email
-            </label>
+            <label>Password</label>
             <input type='text' name='email' value={formik.values.email} onChange={formik.handleChange} />
             </>
         )}
