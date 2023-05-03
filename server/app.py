@@ -11,10 +11,21 @@ def index():
 
 class Cards(Resource):
     def get(self):
-        card_list = [c.to_dict() for c in Card.query.all()]
-        if card_list == None:
-            return make_response({'error': 'card not found'}, 404)
-        return make_response(card_list, 200)
+        c_list = []
+        for c in Card.query.all():
+            c_dict={
+                'id': c.id,
+                'image': c.image,
+                'athlete': c.athlete,
+                'year': c.year,
+                'set': c.set,
+                'extra_info': c.extra_info,
+                'card_num': c.card_num,
+                'card_grade': c.card_grade,
+                'cert_num': c.cert_num
+            }
+            c_list.append(c_dict)
+        return make_response (c_list, 200)
     
     def post(self):
         data=request.get_json()
@@ -120,32 +131,33 @@ class UsersById(Resource):
             return make_response(user.to_dict(), 201)
 api.add_resource(UsersById, '/users/<int:id>')
 
-# class Collections(Resource):
-#     def get(self):
-#         c_list = []
-#         for c in Collection.query.all():
-#             c_dict={
-#                 'id': c.id,
-#                 'name': c.name,
-#                 'location': c.location,
-#                 'img': c.img,
-#                 'reviews': [{'id': review.id, 'rating': review.rating_ , 'review': review.review, 'img': review.img, 'date': review.created_at} for review in r.reviews]
-#             }
-#             c_list.append(c_dict)
-#         return make_response (c_list, 200)
+class Collections(Resource):
+    def get(self):
+        col_list = []
+        for col in Collection.query.all():
+            col_dict={
+                'id': col.id,
+                'name': col.name,
+                'user_id': col.user_id,
+                'card_id': col.card_id
+            }
+            col_list.append(col_dict)
+        return make_response (col_list, 200)
     
-#     def post(self):
-#         data = request.get_json
-#         try:
-#             new_restaurant = Restaurant(name = data['name'],
-#                                         location = data['location'])
-#         except ValueError:
-#             return make_response({}, )
-#         db.session.add(new_restaurant)
-#         db.session.commit()
-#         return make_response(new_restaurant.to_dict(), 201)
-
-# api.add_resource(Restaurants, "/restaurants")
+    def post(self):
+        data = request.get_json
+        try:
+            new_collection = Collection(
+                name = data['name'],
+                user_id = data['user_id'],
+                card_id = data['card_id']
+            )
+        except ValueError:
+            return make_response({'error': 'must be a valid collection'}, 404)
+        db.session.add(new_collection)
+        db.session.commit()
+        return make_response(new_collection.to_dict(), 201)
+api.add_resource(Collections, "/collections")
 
 
 if __name__ == '__main__':
