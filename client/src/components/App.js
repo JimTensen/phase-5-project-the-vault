@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import {Switch, Route, useHistory} from 'react-router-dom'
 import Home from './Home'
-// import Authentication from './components/Authentication'
+import Authentication from './Authentication'
 
 function App() {
     const [user, setUser] = useState(null)

@@ -42,7 +42,7 @@ function Authentication({updateUser}) {
     
     return (
         <>
-        <h2>Login</h2>
+        <h2>{Object.values(formik.errors)}</h2>
         <h2>enter the site or register!</h2>
         <h2>{signUp?'Already a member?':'Not yet a member?'}</h2>
         <button onClick={handleClick}>{signUp?'Log in':'Register'}</button>
