@@ -8,7 +8,7 @@ from config import db
 
 class User(db.Model, SerializerMixin):
     __tablename__ ='users'
-    serialize_rules= ('-created_at', '-updated_at')
+    serialize_rules= ('-created_at', '-updated_at', '-collections')
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
@@ -24,7 +24,7 @@ class User(db.Model, SerializerMixin):
 
 class Card(db.Model, SerializerMixin):
     __tablename__ ='cards'
-    serialize_rules= ('-created_at', '-updated_at')
+    serialize_rules= ('-created_at', '-updated_at', '-collections')
     id = db.Column(db.Integer, primary_key=True)
     image = db.Column(db.String)
     athlete = db.Column(db.String)
@@ -49,7 +49,7 @@ class Card(db.Model, SerializerMixin):
 
 class Collection(db.Model, SerializerMixin):
     __tablename__ ='collections'
-    serialize_rules= ('-created_at', '-updated_at')
+    serialize_rules= ('-created_at', '-updated_at', '-cards', '-users')
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))

@@ -45,6 +45,7 @@ class Cards(Resource):
         db.session.add(new_card)
         db.session.commit()
         return make_response(new_card.to_dict(), 201)
+
 api.add_resource(Cards, '/cards')
 
 
@@ -71,6 +72,7 @@ class CardsById(Resource):
             db.session.add(card)
             db.session.commit()
             return make_response(card.to_dict(), 201)
+
 api.add_resource(CardsById, '/cards/<int:id>')
 
 
@@ -103,6 +105,7 @@ class Users(Resource):
         session['user_id'] = new_user.id
         response = make_response(new_user.to_dict(), 201)
         return response
+
 api.add_resource(Users, '/users')
 
 
@@ -129,7 +132,9 @@ class UsersById(Resource):
             db.session.add(user)
             db.session.commit()
             return make_response(user.to_dict(), 201)
+
 api.add_resource(UsersById, '/users/<int:id>')
+
 
 class Collections(Resource):
     def get(self):
@@ -157,7 +162,36 @@ class Collections(Resource):
         db.session.add(new_collection)
         db.session.commit()
         return make_response(new_collection.to_dict(), 201)
+    
 api.add_resource(Collections, "/collections")
+
+
+class CollectionsById(Resource):
+    def get(self, id):
+        collection = Collection.query.filter_by(id = id).first()
+        if collection == None:
+            return make_response({"error": "collection not found"}, 404)
+        return make_response(collection.to_dict(), 200)
+    
+    def delete(self, id):
+        collection = Collection.query.filter_by(id = id).first()
+        if collection == None:
+            return make_response({"error": "collection not found"}, 404)
+        db.session.delete(collection)
+        db.session.commit()
+        return make_response({"poof!"}, 204)
+    
+    def patch(self, id):
+        collection = Collection.query.filter_by(id = id).first()
+        data = request.get_json()
+        for attr in data:
+            setattr(collection, attr, data[attr])
+        db.session.add(collection)
+        db.session.commit()
+        return make_response(collection.to_dict(), 201)
+    
+api.add_resource(CollectionsById, "/collections/<int:id>")
+
 
 
 if __name__ == '__main__':
