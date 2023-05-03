@@ -11,7 +11,7 @@ def index():
 
 class Cards(Resource):
     def get(self):
-        card_list = [r.to_dict() for r in Review.query.all()]
+        card_list = [c.to_dict() for c in Card.query.all()]
         if card_list == None:
             return make_response({'error': 'card not found'}, 404)
         return make_response(card_list, 200)
@@ -20,6 +20,7 @@ class Cards(Resource):
         data=request.get_json()
         try:
             new_card = Card (
+                image = data['image'],
                 athlete = data['athlete'],
                 year = data['year'],
                 set = data['set'],
@@ -119,32 +120,32 @@ class UsersById(Resource):
             return make_response(user.to_dict(), 201)
 api.add_resource(UsersById, '/users/<int:id>')
 
-class Collections(Resource):
-    def get(self):
-        c_list = []
-        for c in Collection.query.all():
-            c_dict={
-                'id': c.id,
-                'name': c.name,
-                'location': c.location,
-                'img': c.img,
-                'reviews': [{'id': review.id, 'rating': review.rating_ , 'review': review.review, 'img': review.img, 'date': review.created_at} for review in r.reviews]
-            }
-            c_list.append(c_dict)
-        return make_response (c_list, 200)
+# class Collections(Resource):
+#     def get(self):
+#         c_list = []
+#         for c in Collection.query.all():
+#             c_dict={
+#                 'id': c.id,
+#                 'name': c.name,
+#                 'location': c.location,
+#                 'img': c.img,
+#                 'reviews': [{'id': review.id, 'rating': review.rating_ , 'review': review.review, 'img': review.img, 'date': review.created_at} for review in r.reviews]
+#             }
+#             c_list.append(c_dict)
+#         return make_response (c_list, 200)
     
-    def post(self):
-        data = request.get_json
-        try:
-            new_restaurant = Restaurant(name = data['name'],
-                                        location = data['location'])
-        except ValueError:
-            return make_response({}, )
-        db.session.add(new_restaurant)
-        db.session.commit()
-        return make_response(new_restaurant.to_dict(), 201)
+#     def post(self):
+#         data = request.get_json
+#         try:
+#             new_restaurant = Restaurant(name = data['name'],
+#                                         location = data['location'])
+#         except ValueError:
+#             return make_response({}, )
+#         db.session.add(new_restaurant)
+#         db.session.commit()
+#         return make_response(new_restaurant.to_dict(), 201)
 
-api.add_resource(Restaurants, "/restaurants")
+# api.add_resource(Restaurants, "/restaurants")
 
 
 if __name__ == '__main__':

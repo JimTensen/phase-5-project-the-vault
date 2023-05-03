@@ -26,11 +26,12 @@ class Card(db.Model, SerializerMixin):
     __tablename__ ='cards'
     serialize_rules= ('-created_at', '-updated_at')
     id = db.Column(db.Integer, primary_key=True)
+    image = db.Column(db.String)
     athlete = db.Column(db.String)
     year = db.Column(db.Integer)
     set = db.Column(db.String)
     extra_info = db.Column(db.String)
-    card_num = db.Column(db.Integer)
+    card_num = db.Column(db.String)
     card_grade = db.Column(db.Integer, nullable=False)
     cert_num = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, server_default = db.func.now())
@@ -40,10 +41,10 @@ class Card(db.Model, SerializerMixin):
     users = association_proxy('collections', 'user')
 
     @validates('card_grade')
-    def validate_rating(self, key, grade):
-        if not (1 <= grade <= 10):
+    def validate_rating(self, key, grade_num):
+        if not (1 <= grade_num <= 10):
             raise ValueError('grade must be between 1 and 10!')
-        return grade
+        return grade_num
     
 
 class Collection(db.Model, SerializerMixin):
