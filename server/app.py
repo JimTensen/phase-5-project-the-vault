@@ -1,4 +1,4 @@
-from flask import Flask, make_response, request, session
+from flask import Flask, make_response, request, session, abort, jsonify
 from flask_restful import Resource
 
 from config import app, db, api
@@ -7,6 +7,85 @@ from models import User, Card, Collection
 @app.route('/')
 def index():
     return '<h1>Home</h1>'
+
+class AuthorizeSession(Resource):
+    def get(self):
+        user = User.query.filter_by(id = session.get('user_id')).first()
+        if user:
+            response = make_response(user.to_dict(), 200)
+            return response
+        else:
+            abort(401, 'Unauthorized')            
+api.add_resource(AuthorizeSession, '/authorized')
+
+class Login(Resource):
+    def post(self):
+        user = User.query.filter_by(name=request.get_json()['username']).first()
+        session['user_id'] = user.id
+        return make_response(user.to_dict(), 200)
+api.add_resource(Login, '/login')
+
+class Logout(Resource):
+    def delete(self):
+        session['user_id'] = None
+        return make_response('',204)
+api.add_resource(Logout, '/logout')
+
+class Users(Resource):
+    def get(self):
+        u_list=[]
+        for u in User.query.all():
+            u_dict={
+                'id': u.id,
+                'username': u.username,
+                'password': u.password,
+                'first_name': u.first_name,
+                'last_name': u.last_name,
+                'email': u.email
+            }
+            u_list.append(u_dict)
+        return make_response(u_list, 200)
+
+    def post(self):
+        form_json = request.get_json()
+        new_user = User(
+            username = form_json['username'],
+            password = form_json['password'],
+            first_name = form_json['first_name'],
+            last_name = form_json['last_name'],
+            email = form_json['email']
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        session['user_id'] = new_user.id
+        return make_response(new_user.to_dict(), 201)
+api.add_resource(Users, '/users')
+
+
+class UsersById(Resource):
+    def get(self, id):
+        user = User.query.filter_by(id = id).first()
+        if user == None:
+            return make_response({'error': 'user not found'}, 404)
+        return make_response(user.to_dict(), 200)
+    
+    def delete(self, id):
+        user = User.query.filter_by(id = id).first()
+        if user == None:
+            return make_response({'error': 'user not found'}, 404)
+        db.session.delete(user)
+        db.session.commit()
+        return make_response('poof!', 200)
+    
+    def patch(self, id):
+        user = User.query.filter_by(id = id).first()
+        data = request.get_json()
+        for attr in data:
+            setattr(user, attr, data[attr])
+            db.session.add(user)
+            db.session.commit()
+            return make_response(user.to_dict(), 201)
+api.add_resource(UsersById, '/users/<int:id>')
 
 
 class Cards(Resource):
@@ -45,7 +124,6 @@ class Cards(Resource):
         db.session.add(new_card)
         db.session.commit()
         return make_response(new_card.to_dict(), 201)
-
 api.add_resource(Cards, '/cards')
 
 
@@ -72,68 +150,7 @@ class CardsById(Resource):
             db.session.add(card)
             db.session.commit()
             return make_response(card.to_dict(), 201)
-
 api.add_resource(CardsById, '/cards/<int:id>')
-
-
-class Users(Resource):
-    def get(self):
-        u_list=[]
-        for u in User.query.all():
-            u_dict={
-                'id': u.id,
-                'username': u.username,
-                'password': u.password,
-                'first_name': u.first_name,
-                'last_name': u.last_name,
-                'email': u.email
-            }
-            u_list.append(u_dict)
-        return make_response(u_list, 200)
-
-    def post(self):
-        form_json = request.get_json()
-        new_user = User(
-            username = form_json['username'],
-            password = form_json['password'],
-            first_name = form_json['first_name'],
-            last_name = form_json['last_name'],
-            email = form_json['email']
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        session['user_id'] = new_user.id
-        response = make_response(new_user.to_dict(), 201)
-        return response
-
-api.add_resource(Users, '/users')
-
-
-class UsersById(Resource):
-    def get(self, id):
-        user = User.query.filter_by(id = id).first()
-        if user == None:
-            return make_response({'error': 'user not found'}, 404)
-        return make_response(user.to_dict(), 200)
-    
-    def delete(self, id):
-        user = User.query.filter_by(id = id).first()
-        if user == None:
-            return make_response({'error': 'user not found'}, 404)
-        db.session.delete(user)
-        db.session.commit()
-        return make_response('poof!', 200)
-    
-    def patch(self, id):
-        user = User.query.filter_by(id = id).first()
-        data = request.get_json()
-        for attr in data:
-            setattr(user, attr, data[attr])
-            db.session.add(user)
-            db.session.commit()
-            return make_response(user.to_dict(), 201)
-
-api.add_resource(UsersById, '/users/<int:id>')
 
 
 class Collections(Resource):
@@ -162,7 +179,6 @@ class Collections(Resource):
         db.session.add(new_collection)
         db.session.commit()
         return make_response(new_collection.to_dict(), 201)
-    
 api.add_resource(Collections, "/collections")
 
 
@@ -189,10 +205,12 @@ class CollectionsById(Resource):
         db.session.add(collection)
         db.session.commit()
         return make_response(collection.to_dict(), 201)
-    
 api.add_resource(CollectionsById, "/collections/<int:id>")
 
-
+@app.route('/dark_mode', methods=['GET'])
+def dark_mode():
+    response = make_response(jsonify({'cookies':request.cookies['mode']}), 200)
+    return response
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

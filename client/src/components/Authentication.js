@@ -1,7 +1,8 @@
 import React, {useState} from 'react'
 import {useHistory} from 'react-router-dom'
-import {useFormik} from "formik"
-import * as yup from "yup"
+import styled from 'styled-components';
+import {useFormik} from 'formik'
+import * as yup from 'yup'
 
 function Authentication({updateUser}) {
     const [signUp, setSignUp] = useState(false)
@@ -10,8 +11,8 @@ function Authentication({updateUser}) {
     const handleClick = () => setSignUp((signUp) => !signUp)
 
     const formSchema = yup.object().shape({
-        name: yup.string().required(),
-        password: yup.string().email()
+        name: yup.string().required("Please enter a username"),
+        password: yup.string().required("Please enter a password")
     })
 
     const formik = useFormik({
@@ -46,7 +47,7 @@ function Authentication({updateUser}) {
         <h2>enter the site or register!</h2>
         <h2>{signUp?'Already a member?':'Not yet a member?'}</h2>
         <button onClick={handleClick}>{signUp?'Log in':'Register'}</button>
-        <Form onSubmit={formik.handleSubmit}>
+        <form onSubmit={formik.handleSubmit}>
             <label>Username</label>
         <input type='text' name='name' value={formik.values.name} onChange={formik.handleChange} />
         {signUp&&(
@@ -56,7 +57,7 @@ function Authentication({updateUser}) {
             </>
         )}
         <input type='submit' value={signUp?'Sign Up': 'Log In'} />
-        </Form>
+        </form>
         </>
 
     )
