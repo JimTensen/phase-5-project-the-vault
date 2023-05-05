@@ -1,6 +1,7 @@
 from flask import Flask, make_response, request, session, abort, jsonify
 from flask_restful import Resource
 
+
 from config import app, db, api
 from models import User, Card, Collection
 
