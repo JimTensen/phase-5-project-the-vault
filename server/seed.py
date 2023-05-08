@@ -13,8 +13,6 @@ if __name__ == '__main__':
 
         print("Seeding users...")
         users = [
-            User(username="jimtensen", password="meowcat", first_name="Tim", last_name="Jensen", email="tim@jensen.com"),
-            User(username="wizard", password="potato", first_name="Adam", last_name="La Rosa", email="adam@flatiron.com")
         ]
 
         db.session.add_all(users)

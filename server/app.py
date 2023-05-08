@@ -9,51 +9,7 @@ from models import User, Card, Collection
 def index():
     return '<h1>Home</h1>'
 
-class AuthorizeSession(Resource):
-    def get(self):
-        user = User.query.filter_by(id = session.get('user_id')).first()
-        if user:
-            response = make_response(user.to_dict(), 200)
-            return response
-        else:
-            abort(401, 'Unauthorized')            
-api.add_resource(AuthorizeSession, '/authorized')
-
-class Login(Resource):
-        def post(self):
-            user = User.query.filter(
-                User.username == request.get_json()['username']
-            ).first()
-
-            session['user_id'] = user.id
-            return user.to_dict()
-    # def post(self):
-    #     user = User.query.filter_by(name=request.get_json()['username']).first()
-    #     session['user_id'] = user.id
-    #     return make_response(user.to_dict(), 200)
-api.add_resource(Login, '/login')
-
-class Logout(Resource):
-    def delete(self):
-        session['user_id'] = None
-        return make_response('',204)
-api.add_resource(Logout, '/logout')
-
-class Users(Resource):
-    def get(self):
-        u_list=[]
-        for u in User.query.all():
-            u_dict={
-                'id': u.id,
-                'username': u.username,
-                'password': u.password,
-                'first_name': u.first_name,
-                'last_name': u.last_name,
-                'email': u.email
-            }
-            u_list.append(u_dict)
-        return make_response(u_list, 200)
-
+class Register(Resource):
     def post(self):
         form_json = request.get_json()
         new_user = User(
@@ -67,7 +23,51 @@ class Users(Resource):
         db.session.commit()
         session['user_id'] = new_user.id
         return make_response(new_user.to_dict(), 201)
-api.add_resource(Users, '/users')
+api.add_resource(Register, '/register')
+        
+class CheckSession(Resource):
+    def get(self):
+        user = User.query.filter(User.id == session.get('user_id')).first()
+        if user:
+            return make_response(user.to_dict(), 200)
+        else:
+            return make_response({'message': '401: Not Authorized'}, 401)
+api.add_resource(CheckSession, '/check_session')
+
+class Login(Resource):
+    def post(self):
+        username = request.get_json()['username']
+        user = User.query.filter(User.username == username)
+        password = request.get_json()['password']
+
+        if user.authenticate(password):
+            session['user_id'] = user.id
+            return user.to_dict(), 200
+        return make_response({'error': 'Invalid username or password'}, 401)
+api.add_resource(Login, '/login')
+
+class Logout(Resource):
+    def delete(self):
+        session['user_id'] = None
+        return make_response({'logged out': '204: No Content',}, 204)
+api.add_resource(Logout, '/logout')
+
+# class Users(Resource):
+#     def get(self):
+#         u_list=[]
+#         for u in User.query.all():
+#             u_dict={
+#                 'id': u.id,
+#                 'username': u.username,
+#                 'password': u.password,
+#                 'first_name': u.first_name,
+#                 'last_name': u.last_name,
+#                 'email': u.email
+#             }
+#             u_list.append(u_dict)
+#         return make_response(u_list, 200)
+
+# api.add_resource(Users, '/users')
 
 
 class UsersById(Resource):
@@ -215,10 +215,6 @@ class CollectionsById(Resource):
         return make_response(collection.to_dict(), 201)
 api.add_resource(CollectionsById, "/collections/<int:id>")
 
-@app.route('/dark_mode', methods=['GET'])
-def dark_mode():
-    response = make_response(jsonify({'cookies':request.cookies['mode']}), 200)
-    return response
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
