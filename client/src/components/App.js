@@ -1,53 +1,48 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Switch, Route } from "react-router-dom";
-import ExtraPage from "./ExtraPage";
-import Header from "./Header";
-import Home from "./Home";
+import SignUp from "./SignUp";
 import Login from "./Login";
-import MemberArticles from "./MemberArticles";
+import NavBar from "./NavBar";
+import Home from "./Home";
 
 function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("/check_session").then((response) => {
-      if (response.ok) {
-        response.json().then((user) => setUser(user));
+    // auto-login
+    fetch("/check_session").then((r) => {
+      if (r.ok) {
+        r.json().then((user) => setUser(user));
       }
     });
   }, []);
 
-  // {user ? (
-  //   <h2>Welcome, {user.username}!</h2>
-  //  ) : (
-  //   <Login onLogin={setUser} />
-  // )}
-
-  function handleLogin(user) {
-    setUser(user);
-  }
-
-  function handleLogout() {
-    setUser(null);
-  }
-
-  return(
-    <div className="App">
-      <Header user={user} onLogout={handleLogout} />
-      <Switch>
-        <Route exact path="/login">
-          <Login onLogin={handleLogin} />
-        </Route>
-        <Route exact path="/extrapage">
-          <ExtraPage/>
-        </Route>
-        <Route exact path="/">
-          <Home />
-        </Route>
-      </Switch>
-    </div>
+  return (
+    <>
+      <NavBar user={user} setUser={setUser} />
+      <main>
+        {user ? (
+          <Switch>
+            <Route path="/">
+              <Home user={user}/>
+            </Route>
+          </Switch>
+        ) : (
+          <Switch>
+            <Route path="/signup">
+              <SignUp setUser={setUser} />
+            </Route>
+            <Route path="/login">
+              <Login setUser={setUser} />
+            </Route>
+            <Route path="/">
+              <Home />
+            </Route>
+          </Switch>
+        )}
+      </main>
+    </>
   );
-
 }
 
 export default App;

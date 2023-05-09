@@ -1,20 +1,9 @@
-import { useEffect, useState } from "react";
-
-
-function Home() {
-  const [articles, setArticles] = useState([]);
-
-  useEffect(() => {
-    fetch("/articles")
-      .then((r) => r.json())
-      .then(setArticles);
-  }, []);
-
-  return (
-    <main>
-      <h1>this is home</h1>
-    </main>
-  );
+function Home({ user }) {
+  if (user) {
+    return <h1>Welcome, {user.username}!</h1>;
+  } else {
+    return <h1>Please Login or Sign Up</h1>;
+  }
 }
 
 export default Home;

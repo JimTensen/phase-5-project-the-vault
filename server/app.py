@@ -1,70 +1,65 @@
-from flask import Flask, make_response, request, session, abort, jsonify
+from flask import Flask, make_response, request, session
 from flask_restful import Resource
-# from flask.ext.bcrypt import Bcrypt
 
 from config import app, db, api
 from models import User, Card, Collection
 
-# bcrypt = Bcrypt(app)
 
 @app.route('/')
 def index():
-    return '<h1>Home</h1>'
+    return '<h1>Back-End Home</h1>'
 
-class Register(Resource):
-    def post(self):
-        data = request.get_json()
-        new_user = User(
-            username = data['username'],
-            _password_hash = data['password']
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        session['user_id'] = new_user.id
-        return make_response(new_user.to_dict(), 201)
-api.add_resource(Register, '/register')
+class ClearSession(Resource):
+    def delete(self):
+        session['page_views'] = None
+        session['user_id'] = None
+        return make_response({'message': '204: No Content'}, 204)
+api.add_resource(ClearSession, '/clear', endpoint='clear')
+
+class SignUp(Resource):
+    def post(self): 
+        username = request.get_json()['username']
+        password = request.get_json()['password']
+        if username and password:            
+            new_user = User(username=username)
+            new_user.password_hash = password
+            db.session.add(new_user)
+            db.session.commit()
+            session['user_id'] = new_user.id
+            return make_response(new_user.to_dict(), 201)
+        return make_response({'error': '422 Unprocessable Entity'}, 422)
+api.add_resource(SignUp, '/signup')
         
 class CheckSession(Resource):
     def get(self):
-        user = User.query.filter(User.id == session.get('user_id')).first()
-        if user:
-            return user.to_dict()
-        else:
-            return {'message': '204: No Content'}, 204
+        if session.get('user_id'):
+            user = User.query.filter(User.id == session['user_id']).first()            
+            return user.to_dict(), 200
+        return make_response({'message': '204: No Content'}, 204)
 api.add_resource(CheckSession, '/check_session')
 
 class Login(Resource):
-    # this works! but just w user!
-    # def post(self):
-    #     user = User.query.filter(
-    #         User.username == request.get_json()['username']
-    #     ).first()
-    #     return make_response(user.to_dict(), 200)
-    # class Login(Resource):
-
     def post(self):
-
         username = request.get_json()['username']
-        user = User.query.filter(User.username == username)
-
         password = request.get_json()['password']
-        if password == user.password:
+        user = User.query.filter(User.username == username).first()
+        if user.authenticate(password):
             session['user_id'] = user.id
-            return user.to_dict(), 200
+            return make_response(user.to_dict(), 200)
         return {'error': 'Invalid username or password'}, 401
 
-# w hashed password
+    # what I came up with, wrong
     # def post(self):
     #     username = request.get_json()['username']
     #     user = User.query.filter(User.username == username)
 
-    #     password = request.get_json()['password']
+    #     password = request.get_json()['password_hash_']
 
     #     if user.authenticate(password):
     #         session['user_id'] = user.id
     #         return user.to_dict(), 200
 
-        # return {'error': 'Invalid username or password'}, 401
+    #     return {'error': 'Invalid username or password'}, 401
 api.add_resource(Login, '/login')
 
 class Logout(Resource):
