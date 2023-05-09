@@ -1,9 +1,11 @@
 from flask import Flask, make_response, request, session, abort, jsonify
 from flask_restful import Resource
-
+# from flask.ext.bcrypt import Bcrypt
 
 from config import app, db, api
 from models import User, Card, Collection
+
+# bcrypt = Bcrypt(app)
 
 @app.route('/')
 def index():
@@ -11,13 +13,10 @@ def index():
 
 class Register(Resource):
     def post(self):
-        form_json = request.get_json()
+        data = request.get_json()
         new_user = User(
-            username = form_json['username'],
-            password = form_json['password'],
-            first_name = form_json['first_name'],
-            last_name = form_json['last_name'],
-            email = form_json['email']
+            username = data['username'],
+            _password_hash = data['password']
         )
         db.session.add(new_user)
         db.session.commit()
@@ -29,27 +28,49 @@ class CheckSession(Resource):
     def get(self):
         user = User.query.filter(User.id == session.get('user_id')).first()
         if user:
-            return make_response(user.to_dict(), 200)
+            return user.to_dict()
         else:
-            return make_response({'message': '401: Not Authorized'}, 401)
+            return {'message': '204: No Content'}, 204
 api.add_resource(CheckSession, '/check_session')
 
 class Login(Resource):
+    # this works! but just w user!
+    # def post(self):
+    #     user = User.query.filter(
+    #         User.username == request.get_json()['username']
+    #     ).first()
+    #     return make_response(user.to_dict(), 200)
+    # class Login(Resource):
+
     def post(self):
+
         username = request.get_json()['username']
         user = User.query.filter(User.username == username)
-        password = request.get_json()['password']
 
-        if user.authenticate(password):
+        password = request.get_json()['password']
+        if password == user.password:
             session['user_id'] = user.id
             return user.to_dict(), 200
-        return make_response({'error': 'Invalid username or password'}, 401)
+        return {'error': 'Invalid username or password'}, 401
+
+# w hashed password
+    # def post(self):
+    #     username = request.get_json()['username']
+    #     user = User.query.filter(User.username == username)
+
+    #     password = request.get_json()['password']
+
+    #     if user.authenticate(password):
+    #         session['user_id'] = user.id
+    #         return user.to_dict(), 200
+
+        # return {'error': 'Invalid username or password'}, 401
 api.add_resource(Login, '/login')
 
 class Logout(Resource):
     def delete(self):
         session['user_id'] = None
-        return make_response({'logged out': '204: No Content',}, 204)
+        return {'message': '204: No Content'}, 204
 api.add_resource(Logout, '/logout')
 
 # class Users(Resource):
@@ -85,14 +106,14 @@ class UsersById(Resource):
         db.session.commit()
         return make_response('poof!', 200)
     
-    def patch(self, id):
-        user = User.query.filter_by(id = id).first()
-        data = request.get_json()
-        for attr in data:
-            setattr(user, attr, data[attr])
-            db.session.add(user)
-            db.session.commit()
-            return make_response(user.to_dict(), 201)
+    # def patch(self, id):
+    #     user = User.query.filter_by(id = id).first()
+    #     data = request.get_json()
+    #     for attr in data:
+    #         setattr(user, attr, data[attr])
+    #         db.session.add(user)
+    #         db.session.commit()
+    #         return make_response(user.to_dict(), 201)
 api.add_resource(UsersById, '/users/<int:id>')
 
 

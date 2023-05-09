@@ -1,28 +1,53 @@
-import React, {useState, useEffect} from 'react'
-import {Switch, Route, useHistory} from 'react-router-dom'
-import GlobalStyle from '../globalStyles'
-import Nav from './Nav'
-import Home from './Home'
-import Authentication from './Authentication'
-import Login from './Login'
+import { useState, useEffect } from "react";
+import { Switch, Route } from "react-router-dom";
+import ExtraPage from "./ExtraPage";
+import Header from "./Header";
+import Home from "./Home";
+import Login from "./Login";
+import MemberArticles from "./MemberArticles";
 
 function App() {
-    const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
 
-    useEffect(() => {
-      fetch("/authorized").then((response) => {
-        if (response.ok) {
-          response.json().then((user) => setUser(user));
-        }
-      });
-    }, []);
-  
-    if (user) {
-      return <h2>Welcome, {user.username}!</h2>;
-    } else {
-      return <Login onLogin={setUser} />;
-    }
+  useEffect(() => {
+    fetch("/check_session").then((response) => {
+      if (response.ok) {
+        response.json().then((user) => setUser(user));
+      }
+    });
+  }, []);
+
+  // {user ? (
+  //   <h2>Welcome, {user.username}!</h2>
+  //  ) : (
+  //   <Login onLogin={setUser} />
+  // )}
+
+  function handleLogin(user) {
+    setUser(user);
   }
 
+  function handleLogout() {
+    setUser(null);
+  }
 
-export default App
+  return(
+    <div className="App">
+      <Header user={user} onLogout={handleLogout} />
+      <Switch>
+        <Route exact path="/login">
+          <Login onLogin={handleLogin} />
+        </Route>
+        <Route exact path="/extrapage">
+          <ExtraPage/>
+        </Route>
+        <Route exact path="/">
+          <Home />
+        </Route>
+      </Switch>
+    </div>
+  );
+
+}
+
+export default App;
