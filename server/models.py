@@ -67,7 +67,8 @@ class Card(db.Model, SerializerMixin):
     __tablename__ ='cards'
     serialize_rules= ('-created_at', '-updated_at', '-collections')
     id = db.Column(db.Integer, primary_key=True)
-    image = db.Column(db.String)
+    image_front = db.Column(db.String)
+    image_back = db.Column(db.String)
     athlete = db.Column(db.String)
     year = db.Column(db.Integer)
     set = db.Column(db.String)
