@@ -12,12 +12,12 @@ if __name__ == '__main__':
         Collection.query.delete()
 
         print("Seeding users...")
-        # users = [
-        #     User(username="jimtensen", _password_hash="meowcat"),
-        #     User(username="wizard", _password_hash="potato")
-        # ]
+        users = [
+            User(username="123", _password_hash="$2b$12$8/E5LMt9LavvHkOzr8XCH.SOO5KxgISG.rE..SRATgEdE4riDz2Ii"),
+            User(username="456", _password_hash="$2b$12$wydXcUz0glHlzRal.BozKOyVB4JZugV3Z4RbxbbeyAoizobLEe0pq")
+        ]
 
-        # db.session.add_all(users)
+        db.session.add_all(users)
 
         print("Seeding cards...")
         cards = [
@@ -30,13 +30,13 @@ if __name__ == '__main__':
         db.session.add_all(cards)
 
         print("Seeding collections...")
-        # collections = []
-        # for card in cards:
-        #     user = rc(users)
-        #     collections.append(
-        #         Collection(card=card, user=user, name="")
-        #     )
-        # db.session.add_all(collections)
+        collections = []
+        for card in cards:
+            user = rc(users)
+            collections.append(
+                Collection(card=card, user=user, name="this_one")
+            )
+        db.session.add_all(collections)
         db.session.commit()
 
         print("Done seeding!")
