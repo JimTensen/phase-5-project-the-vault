@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { addCollection } from '../actions/collectionActions';
+import { addCollection } from '../../actions/collectionActions';
 
 function CollectionForm() {
   const [name, setName] = useState('');

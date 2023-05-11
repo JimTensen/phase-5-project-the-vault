@@ -1,20 +1,20 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import {Router, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import configureStore from './store/configureStore';
-import PrivateRoute from './components/common/PrivateRoute';
-import Header from './components/layout/Header';
-import CollectionList from './components/collection/CollectionList';
-import Collection from './components/collection/Collection';
-import Login from './components/auth/Login';
-import Signup from './components/auth/Signup';
+import configureStore from '../store/configureStore';
+import PrivateRoute from './common/PrivateRoute';
+import Header from './layout/Header';
+import CollectionList from './collection/CollectionList';
+import Login from './auth/Login';
+import Signup from './auth/Signup';
 
 const store = configureStore();
 
-const App = () => {
+function App() {
   return (
     <Provider store={store}>
       <Router>
+        <h1>it works</h1>
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="container mx-auto flex-grow">

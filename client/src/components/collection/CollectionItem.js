@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { deleteCollection } from '../actions/collectionActions';
+import { deleteCollection } from '../../actions/collectionActions';
 import { useHistory } from 'react-router-dom';
 
 function CollectionItem({ collection }) {

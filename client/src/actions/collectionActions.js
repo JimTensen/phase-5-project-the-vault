@@ -1,4 +1,4 @@
-import { GET_COLLECTIONS, ADD_COLLECTION, DELETE_COLLECTION, UPDATE_COLLECTION } from './types';
+import { GET_COLLECTIONS, ADD_COLLECTION, DELETE_COLLECTION, } from './types';
 
 export const getCollections = () => (dispatch) => {
   fetch('http://localhost:5555/collections')
@@ -49,22 +49,22 @@ export const deleteCollection = (id) => (dispatch) => {
     });
 };
 
-export const updateCollection = (id, collectionData) => (dispatch) => {
-  fetch(`http://localhost:5555/collections/${id}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(collectionData),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      dispatch({
-        type: UPDATE_COLLECTION,
-        payload: data,
-      });
-    })
-    .catch((error) => {
-      console.log('Error updating collection:', error);
-    });
-};
+// export const updateCollection = (id, collectionData) => (dispatch) => {
+//   fetch(`http://localhost:5555/collections/${id}`, {
+//     method: 'PATCH',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify(collectionData),
+//   })
+//     .then((response) => response.json())
+//     .then((data) => {
+//       dispatch({
+//         type: UPDATE_COLLECTION,
+//         payload: data,
+//       });
+//     })
+//     .catch((error) => {
+//       console.log('Error updating collection:', error);
+//     });
+// };

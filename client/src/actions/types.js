@@ -8,9 +8,10 @@ export const UPDATE_CARD = 'UPDATE_CARD';
 export const GET_COLLECTIONS = 'GET_COLLECTIONS';
 export const ADD_COLLECTION = 'ADD_COLLECTION';
 export const DELETE_COLLECTION = 'DELETE_COLLECTION';
-export const UPDATE_COLLECTION = 'UPDATE_COLLECTION';
 
-// User Actions
+// Auth Actions
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 export const LOGOUT = 'LOGOUT';
+export const SIGNUP_SUCCESS = 'SIGNUP_SUCCESS';
+export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
