@@ -1,48 +1,33 @@
-import React, { useEffect, useState } from "react";
-import { Switch, Route } from "react-router-dom";
-import SignUp from "./SignUp";
-import Login from "./Login";
-import NavBar from "./NavBar";
-import Home from "./Home";
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import configureStore from './store/configureStore';
+import PrivateRoute from './components/common/PrivateRoute';
+import Header from './components/layout/Header';
+import CollectionList from './components/collection/CollectionList';
+import Collection from './components/collection/Collection';
+import Login from './components/auth/Login';
+import Signup from './components/auth/Signup';
 
-function App() {
-  const [user, setUser] = useState(null);
+const store = configureStore();
 
-  useEffect(() => {
-    // auto-login
-    fetch("/check_session").then((r) => {
-      if (r.ok) {
-        r.json().then((user) => setUser(user));
-      }
-    });
-  }, []);
-
+const App = () => {
   return (
-    <>
-      <NavBar user={user} setUser={setUser} />
-      <main>
-        {user ? (
-          <Switch>
-            <Route path="/">
-              <Home user={user}/>
-            </Route>
-          </Switch>
-        ) : (
-          <Switch>
-            <Route path="/signup">
-              <SignUp setUser={setUser} />
-            </Route>
-            <Route path="/login">
-              <Login setUser={setUser} />
-            </Route>
-            <Route path="/">
-              <Home />
-            </Route>
-          </Switch>
-        )}
-      </main>
-    </>
+    <Provider store={store}>
+      <Router>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <main className="container mx-auto flex-grow">
+            <Switch>
+              <PrivateRoute exact path="/collections" component={CollectionList} />
+              <Route path="/login" component={Login} />
+              <Route path="/signup" component={Signup} />
+            </Switch>
+          </main>
+        </div>
+      </Router>
+    </Provider>
   );
-}
+};
 
 export default App;
